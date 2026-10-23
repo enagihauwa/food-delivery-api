@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 /** Query params shared by every list endpoint. Extend with resource filters. */
 export class PaginationQueryDto {
@@ -18,6 +18,7 @@ export class PaginationQueryDto {
   @Type(() => Number)
   @IsInt({ message: 'offset must be an integer' })
   @Min(0, { message: 'offset must be 0 or greater' })
+  @Max(2_147_483_647, { message: 'offset is too large' })
   offset?: number;
 
   @IsOptional()

@@ -191,6 +191,7 @@ describe('restaurants', () => {
     };
 
     it('negative offset is 400 and names offset', () => expectError('/restaurants?offset=-1', 400, 'BAD_REQUEST', 'offset'));
+    it('absurdly large offset is 400, not a 500', () => expectError('/restaurants?offset=99999999999', 400, 'BAD_REQUEST', 'offset'));
     it('non-numeric offset is 400', () => expectError('/restaurants?offset=abc', 400, 'BAD_REQUEST', 'offset'));
     it('limit=0 is 400', () => expectError('/restaurants?limit=0', 400, 'BAD_REQUEST', 'limit'));
     it('limit=-5 is 400', () => expectError('/restaurants?limit=-5', 400, 'BAD_REQUEST', 'limit'));
