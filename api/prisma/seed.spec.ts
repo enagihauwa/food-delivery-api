@@ -26,6 +26,10 @@ describe('seed dataset', () => {
     expect(new Set(emails).size).toBe(emails.length);
   });
 
+  it('writes plain-English menu descriptions that start with the dish name', () => {
+    for (const m of a.menuItems) expect(m.description.startsWith(`${m.name}. `)).toBe(true);
+  });
+
   it('stores prices as positive integer kobo', () => {
     for (const m of a.menuItems) {
       expect(Number.isInteger(m.priceKobo)).toBe(true);

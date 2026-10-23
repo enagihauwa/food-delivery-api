@@ -103,6 +103,16 @@ const STATUS_WEIGHTS: Array<{ value: Status; weight: number }> = [
   { value: 'cancelled', weight: 10 },
 ];
 
+const BLURBS = [
+  'Freshly prepared to order.',
+  'A customer favourite.',
+  'Made with locally sourced ingredients.',
+  'Generous portion, served hot.',
+  "The chef's special recipe.",
+  'Light, tasty and filling.',
+  'Slow cooked for extra flavour.',
+];
+
 const FROM = new Date('2026-01-01T00:00:00Z');
 const TO = new Date('2026-10-01T00:00:00Z');
 
@@ -148,11 +158,12 @@ export function buildDataset() {
     const count = faker.number.int({ min: COUNTS.itemsPerRestaurant[0], max: COUNTS.itemsPerRestaurant[1] });
     return Array.from({ length: count }, (_, k) => {
       const category = faker.helpers.arrayElement(CATEGORIES);
+      const name = faker.helpers.arrayElement(DISHES[r.cuisine][category]);
       return {
         id: id('menu-item', ri * 100 + k),
         restaurantId: r.id,
-        name: faker.helpers.arrayElement(DISHES[r.cuisine][category]),
-        description: faker.lorem.sentence({ min: 5, max: 10 }),
+        name,
+        description: `${name}. ${faker.helpers.arrayElement(BLURBS)}`,
         category,
         // N500..N15,000 in N50 steps, stored as integer kobo
         priceKobo: faker.number.int({ min: 10, max: 300 }) * 50 * 100,
