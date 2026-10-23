@@ -1,0 +1,14 @@
+{
+  "name": "food-delivery-consumer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Static single-page client that calls the deployed Food Delivery API.",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}

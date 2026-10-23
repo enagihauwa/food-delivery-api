@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Restaurant Browser</title>
+    <meta name="description" content="Browse restaurants and menus served by the Food Delivery API." />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Restaurants</h1>
+      <p class="sub">Live data from the Food Delivery API · <code id="api-host">…</code></p>
+    </header>
+    <main id="app" aria-live="off">Loading…</main>
+    <script src="config.js"></script>
+    <script type="module" src="src/main.js"></script>
+    <noscript>This page needs JavaScript to call the API.</noscript>
+  </body>
+</html>
