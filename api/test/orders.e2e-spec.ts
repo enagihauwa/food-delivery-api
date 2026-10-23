@@ -132,6 +132,19 @@ describe('orders', () => {
       expect(seen).toHaveLength(total);
     });
 
+    it('a cursor keeps working after the row it points at is deleted', async () => {
+      const a = (await newOrder()).body.data;
+      const b = (await newOrder()).body.data;
+      const c = (await newOrder()).body.data;
+      const base = `/orders?customerId=${customerId}&sort=createdAt&order=desc&limit=1`;
+      const first = (await get(base).expect(200)).body;
+      expect(first.data[0].id).toBe(c.id); // newest first
+      await del(c.id).expect(204);
+      const second = (await get(`${base}&cursor=${first.meta.nextCursor}`).expect(200)).body;
+      expect(second.data[0].id).toBe(b.id);
+      expect(second.data.map((o: { id: string }) => o.id)).not.toContain(a.id);
+    });
+
     it.each([
       ['/orders?status=teleported', 'BAD_REQUEST'],
       ['/orders?restaurantId=abc', 'BAD_REQUEST'],
