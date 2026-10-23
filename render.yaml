@@ -1,0 +1,39 @@
+# Render Blueprint: API web service + managed PostgreSQL.
+# Dashboard: New > Blueprint > pick this repository.
+databases:
+  - name: foodapi-db
+    databaseName: foodapi
+    user: foodapi
+    plan: free
+
+services:
+  - type: web
+    name: food-delivery-api
+    runtime: node
+    rootDir: api
+    plan: free
+    healthCheckPath: /health
+    # devDependencies are needed to build (Nest CLI) and to seed (tsx).
+    buildCommand: npm ci --include=dev && npm run build
+    # Applies pending migrations, runs the idempotent seed (a no-op once loaded), then starts the API.
+    startCommand: npm run start:render
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: foodapi-db
+          property: connectionString
+      - key: RATE_LIMIT_MAX
+        value: "100"
+      - key: RATE_LIMIT_TTL_MS
+        value: "60000"
+      - key: PAGINATION_DEFAULT_LIMIT
+        value: "20"
+      - key: PAGINATION_MAX_LIMIT
+        value: "100"
+      # Set to the consumer's deployed URL (comma-separated for several), e.g. https://my-consumer.netlify.app
+      - key: CORS_ORIGINS
+        sync: false
