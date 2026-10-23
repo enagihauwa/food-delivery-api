@@ -38,4 +38,30 @@ describe('infrastructure', () => {
     const res = await request(app.getHttpServer()).get('/health');
     expect(res.headers['x-content-type-options']).toBe('nosniff');
   });
+
+  describe('CORS', () => {
+    const allowed = 'http://localhost:5173'; // CORS_ORIGINS in .env.example
+
+    it('allows the configured consumer origin and exposes Retry-After', async () => {
+      const res = await request(app.getHttpServer()).get('/api/v1/restaurants?limit=1').set('Origin', allowed).expect(200);
+      expect(res.headers['access-control-allow-origin']).toBe(allowed);
+      expect(res.headers['access-control-expose-headers']).toContain('Retry-After');
+      expect(res.headers['cross-origin-resource-policy']).toBe('cross-origin');
+    });
+
+    it('does not grant other origins', async () => {
+      const res = await request(app.getHttpServer()).get('/api/v1/restaurants?limit=1').set('Origin', 'http://evil.example');
+      expect(res.headers['access-control-allow-origin']).toBeUndefined();
+    });
+
+    it('answers preflight for PATCH', async () => {
+      const res = await request(app.getHttpServer())
+        .options('/api/v1/orders/x')
+        .set('Origin', allowed)
+        .set('Access-Control-Request-Method', 'PATCH')
+        .set('Access-Control-Request-Headers', 'content-type')
+        .expect(204);
+      expect(res.headers['access-control-allow-methods']).toContain('PATCH');
+    });
+  });
 });

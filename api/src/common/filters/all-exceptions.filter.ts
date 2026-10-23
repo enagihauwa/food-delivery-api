@@ -44,7 +44,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const status = exception.getStatus();
       const body = exception.getResponse();
       const raw = typeof body === 'string' ? body : (body as { message?: unknown }).message;
-      const message = Array.isArray(raw) ? raw.join('; ') : String(raw ?? exception.message);
+      const message = Array.isArray(raw) ? raw.join('; ') : typeof raw === 'string' ? raw : exception.message;
       return { status, error: this.build(codeFor(status), message) };
     }
 

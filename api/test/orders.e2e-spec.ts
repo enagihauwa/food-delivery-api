@@ -66,7 +66,7 @@ describe('orders', () => {
       expect(res.body.data.length).toBe(20);
       expect(res.body.meta).toMatchObject({ limit: 20, offset: null, hasMore: true });
       const dates = res.body.data.map((o: { createdAt: string }) => o.createdAt);
-      expect(dates).toEqual([...dates].sort().reverse());
+      expect(dates).toEqual([...dates].sort((a: string, b: string) => b.localeCompare(a)));
       expect(res.body.data[0]).toEqual({
         id: expect.any(String),
         customerId: expect.any(String),
@@ -209,7 +209,8 @@ describe('orders', () => {
     it('empty body lists every required field', async () => {
       const res = await post({}).expect(422);
       const names = res.body.error.details.map((d: { field: string }) => d.field);
-      expect(names).toEqual(expect.arrayContaining(['customerId', 'restaurantId', 'deliveryAddress', 'items']));
+      expect(names).toEqual(['customerId', 'restaurantId', 'deliveryAddress', 'items']); // one entry per field
+      expect(res.body.error.details).toContainEqual({ field: 'items', message: 'items is required' });
     });
 
     it('no body at all is 422, never 500', async () => {

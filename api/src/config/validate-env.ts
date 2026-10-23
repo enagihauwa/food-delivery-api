@@ -11,7 +11,7 @@ export function validateEnv(env: Record<string, unknown>): Record<string, unknow
     const raw = env[key];
     if (raw === undefined || raw === '') continue;
     const n = Number(raw);
-    if (!Number.isInteger(n) || n < 1) problems.push(`${key} must be a positive integer (got "${String(raw)}")`);
+    if (!Number.isInteger(n) || n < 1) problems.push(`${key} must be a positive integer (got ${JSON.stringify(raw)})`);
   }
   const def = Number(env.PAGINATION_DEFAULT_LIMIT ?? 20);
   const max = Number(env.PAGINATION_MAX_LIMIT ?? 100);

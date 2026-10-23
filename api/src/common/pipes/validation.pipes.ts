@@ -1,10 +1,17 @@
 import { ValidationPipe, type ValidationError } from '@nestjs/common';
 import { AppException, type ErrorDetail } from '../errors/app-exception.js';
 
-function flatten(errors: ValidationError[], parent = ''): ErrorDetail[] {
+/** One clear message per problem: a missing value is simply "required", not every rule it fails. */
+export function flatten(errors: ValidationError[], parent = ''): ErrorDetail[] {
   return errors.flatMap((e) => {
     const field = parent ? `${parent}.${e.property}` : e.property;
-    const own = Object.values(e.constraints ?? {}).map((message) => ({ field, message }));
+    const messages = Object.values(e.constraints ?? {});
+    const own =
+      e.value === undefined || e.value === null
+        ? messages.length
+          ? [{ field, message: `${e.property} is required` }]
+          : []
+        : [...new Set(messages)].map((message) => ({ field, message }));
     return [...own, ...flatten(e.children ?? [], field)];
   });
 }
