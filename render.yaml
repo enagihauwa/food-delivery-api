@@ -34,6 +34,6 @@ services:
         value: "20"
       - key: PAGINATION_MAX_LIMIT
         value: "100"
-      # Set to the consumer's deployed URL (comma-separated for several), e.g. https://my-consumer.netlify.app
+      # Set to the consumer's deployed URL (comma-separated for several), e.g. https://my-consumer.vercel.app
       - key: CORS_ORIGINS
         sync: false

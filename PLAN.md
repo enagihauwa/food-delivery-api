@@ -15,7 +15,7 @@ Budget: 12–16 hours. Target band: **Excellent** (cursor pagination with the tr
 | Pagination | **Cursor (keyset) on every list endpoint**; `offset` supported as an alternative | Excellent band; tradeoff documented |
 | Rate limiting | `@nestjs/throttler`, values from config | Per-IP, 429 + `Retry-After` |
 | API host | Railway (API service + Postgres) | Managed Postgres, env var UI, public domain |
-| Consumer | **Separate application** (own folder/repo, own deployment) on Vercel or Netlify | Proves the API works from outside its own codebase |
+| Consumer | **Separate application** (own folder/repo, own deployment) on Vercel | Proves the API works from outside its own codebase |
 
 ## 1. Resource design (≈1 hr) — put in README first
 
@@ -311,7 +311,7 @@ Test: someone who has never seen the project can use the API from this README al
 
 ## 10. Consumer (separate application, deployed separately) (≈2 hr)
 
-Own folder `consumer/` (ideally its own repo) with its own build and its own deployment on Vercel or Netlify. It shares no code with the API and reads only a single env/config value: `API_BASE_URL=https://<api-domain>/api/v1` (a Vite app with `VITE_API_BASE_URL`, or plain HTML/JS with a `config.js`). No localhost fallback in the deployed build.
+Own folder `consumer/` (ideally its own repo) with its own build and its own deployment on Vercel. It shares no code with the API and reads only a single env/config value: `API_BASE_URL=https://<api-domain>/api/v1` (a Vite app with `VITE_API_BASE_URL`, or plain HTML/JS with a `config.js`). No localhost fallback in the deployed build.
 
 Features:
 - Restaurant list showing name, cuisine, city, rating
