@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Cuisine {
+  pizza
+  burgers
+  jollof
+  suya
+  sushi
+  chinese
+  bakery
+  vegetarian
+}
+
+enum MenuCategory {
+  starter
+  main
+  side
+  drink
+  dessert
+}
+
+enum OrderStatus {
+  pending
+  preparing
+  out_for_delivery
+  delivered
+  cancelled
+}
+
+model Restaurant {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  cuisine   Cuisine
+  city      String
+  address   String
+  phone     String?
+  rating    Float    @default(0)
+  isOpen    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  menuItems MenuItem[]
+  orders    Order[]
+
+  @@index([cuisine])
+  @@index([city])
+  @@index([rating, id])
+  @@index([createdAt, id])
+  @@map("restaurants")
+}
+
+model MenuItem {
+  id           String       @id @default(uuid()) @db.Uuid
+  restaurantId String       @db.Uuid
+  name         String
+  description  String?
+  category     MenuCategory
+  priceKobo    Int
+  available    Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@index([restaurantId, id])
+  @@index([category])
+  @@index([priceKobo, id])
+  @@map("menu_items")
+}
+
+model Customer {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String   @unique
+  phone     String?
+  city      String
+  createdAt DateTime @default(now())
+
+  orders Order[]
+
+  @@index([city])
+  @@index([createdAt, id])
+  @@map("customers")
+}
+
+model Order {
+  id              String      @id @default(uuid()) @db.Uuid
+  customerId      String      @db.Uuid
+  restaurantId    String      @db.Uuid
+  status          OrderStatus @default(pending)
+  deliveryAddress String
+  totalKobo       Int
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Restrict)
+  items      OrderItem[]
+
+  @@index([customerId, id])
+  @@index([restaurantId, id])
+  @@index([status])
+  @@index([createdAt, id])
+  @@index([totalKobo, id])
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String @id @default(uuid()) @db.Uuid
+  orderId       String @db.Uuid
+  menuItemId    String @db.Uuid
+  quantity      Int
+  unitPriceKobo Int
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([menuItemId])
+  @@map("order_items")
+}
