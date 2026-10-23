@@ -32,8 +32,11 @@ export interface PageQuery {
 
 /** The slice of a Prisma delegate this helper needs. */
 export interface ListDelegate<T> {
-  findMany(args: Record<string, unknown>): Promise<T[]>;
-  count(args: { where?: Record<string, unknown> }): Promise<number>;
+  // `any` args: Prisma's generated delegates use per-model arg types that a shared interface cannot express.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  findMany(args: any): Promise<T[]>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  count(args: any): Promise<number>;
 }
 
 export interface PaginateArgs<T> {
