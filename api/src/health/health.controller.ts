@@ -1,5 +1,4 @@
-import { Controller, Get, Req, ServiceUnavailableException } from '@nestjs/common';
-import type { Request } from 'express';
+import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaService } from '../prisma/prisma.service.js';
 
@@ -7,19 +6,6 @@ import { PrismaService } from '../prisma/prisma.service.js';
 @Controller('health')
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
-
-  // TEMPORARY diagnostic: shows what the proxy chain delivers. Remove after fixing the rate-limit key.
-  @Get('ip')
-  ip(@Req() req: Request) {
-    return {
-      ip: req.ip,
-      ips: req.ips,
-      xForwardedFor: req.headers['x-forwarded-for'],
-      cfConnectingIp: req.headers['cf-connecting-ip'],
-      trueClientIp: req.headers['true-client-ip'],
-      socket: req.socket.remoteAddress,
-    };
-  }
 
   @Get()
   async check() {
