@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { Request, Response } from 'express';
 import helmet from 'helmet';
 import type { AppConfig } from './config/configuration.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
@@ -23,4 +24,15 @@ export function configureApp(app: NestExpressApplication) {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new ResponseEnvelopeInterceptor());
   return app;
+}
+
+/**
+ * Call after `app.init()`. Nest only installs its JSON 404 handler under the global prefix,
+ * so anything else (e.g. `/restaurants`) would get Express's HTML page. This catch-all,
+ * registered after every route, keeps the error envelope consistent everywhere.
+ */
+export function registerNotFoundFallback(app: NestExpressApplication) {
+  app.use((req: Request, res: Response) => {
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: `Route ${req.method} ${req.path} not found` } });
+  });
 }

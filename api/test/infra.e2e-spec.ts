@@ -21,8 +21,14 @@ describe('infrastructure', () => {
     expect(res.body).toEqual({ error: { code: 'NOT_FOUND', message: expect.any(String) } });
   });
 
-  it('unversioned paths do not exist', async () => {
-    await request(app.getHttpServer()).get('/restaurants').expect(404);
+  it('paths outside /api/v1 are a 404 in the error envelope too, never an HTML page', async () => {
+    for (const path of ['/restaurants', '/', '/health/ip', '/api/restaurants', '/favicon.ico']) {
+      const res = await request(app.getHttpServer()).get(path).expect(404);
+      expect(res.headers['content-type']).toMatch(/application\/json/);
+      expect(res.body).toEqual({ error: { code: 'NOT_FOUND', message: expect.any(String) } });
+    }
+    const post = await request(app.getHttpServer()).post('/nope').send({}).expect(404);
+    expect(post.body.error.code).toBe('NOT_FOUND');
   });
 
   it('malformed JSON body is a 400 in the error envelope (never 500)', async () => {
