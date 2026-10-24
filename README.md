@@ -2,14 +2,14 @@
 
 A public, read-friendly REST API for a Nigerian food-delivery market: restaurants, their menus, customers and the orders customers place. Prices are in **kobo**. Everything is versioned under `/api/v1`.
 
-- **Live API:** `https://YOUR-API.up.railway.app` *(replace after deployment, see [Deployment](#deployment))*
+- **Live API:** `https://food-delivery-api-4a2m.onrender.com` *(hosted on Render; see [Deployment](#deployment))*
 - **Consumer app:** `https://YOUR-CONSUMER.vercel.app` *(a separate application that calls the live API; source in [`consumer/`](consumer/))*
 - **Stack:** NestJS 12, Prisma 7, PostgreSQL, `class-validator`, `@nestjs/throttler`
 
 Quick taste:
 
 ```bash
-API=https://YOUR-API.up.railway.app
+API=https://food-delivery-api-4a2m.onrender.com
 curl "$API/api/v1/restaurants?cuisine=jollof&sort=rating&order=desc&limit=2"
 ```
 
@@ -184,7 +184,7 @@ Browsers on origins listed in `CORS_ORIGINS` can call the API; `Retry-After`, `L
 
 ## Endpoint reference
 
-Examples assume `API=https://YOUR-API.up.railway.app`. Responses are real output from the seeded database, with long lists trimmed to two rows. Replace the ids with ones from your own calls.
+Examples assume `API=https://food-delivery-api-4a2m.onrender.com`. Responses are real output from the seeded database, with long lists trimmed to two rows. Replace the ids with ones from your own calls.
 
 ### Restaurants
 
@@ -551,7 +551,7 @@ npm run start:dev                # http://localhost:3000/api/v1/restaurants
 | Variable | Default | Purpose |
 |---|---|---|
 | `DATABASE_URL` | none (required) | Postgres connection string |
-| `PORT` | `3000` | HTTP port (Railway injects this) |
+| `PORT` | `3000` | HTTP port (Render injects this) |
 | `RATE_LIMIT_MAX` | `100` | requests allowed per window per IP |
 | `RATE_LIMIT_TTL_MS` | `60000` | window length in milliseconds |
 | `PAGINATION_DEFAULT_LIMIT` | `20` | page size when `limit` is omitted |
@@ -590,15 +590,15 @@ The e2e suite drives the same pipeline as production and covers: every bad-input
 
 ## Deployment
 
-The API is deployed on Railway with a managed PostgreSQL database. *(Fill in after deploying.)*
+The API is deployed on Render (Blueprint in `render.yaml`) with a managed PostgreSQL database.
 
-1. Create a Railway project, add the **PostgreSQL** plugin, then add a service from this repository with root directory `api/`.
-2. Set variables on the API service: `DATABASE_URL` = reference to the Postgres plugin's URL, `NODE_ENV=production`, `CORS_ORIGINS=<consumer url>`, and optionally the rate-limit and pagination values.
-3. Build command `npm run build`; start command `npx prisma migrate deploy && node dist/main`; health check path `/health`.
-4. Seed production once (idempotent, so re-running is safe): `railway run npm run db:seed`, or from your machine with the public connection string in `DATABASE_URL`.
-5. Generate a public domain and confirm: `curl https://<domain>/api/v1/restaurants?limit=1` should return `meta.total` around 300.
+1. In Render choose **New > Blueprint** and select this repository; it reads [`render.yaml`](render.yaml) and creates the API web service and a managed PostgreSQL database.
+2. Fill in `CORS_ORIGINS` with the consumer's URL (no trailing slash). `DATABASE_URL` is wired to the database automatically; the other variables have defaults in the Blueprint.
+3. Build command `npm ci --include=dev && npm run build`; start command `npm run start:render` (applies migrations, runs the idempotent seed, starts the API); health check path `/health`. Set `NODE_VERSION` to `22`.
+4. The seed runs against production on every boot; it inserts nothing once the data is loaded. You can also run it by hand with the database's external URL: `DATABASE_URL=<external url> npm run db:seed`.
+5. Confirm: `curl https://<service>.onrender.com/api/v1/restaurants?limit=1` returns `meta.total` of 300.
 
-The app trusts one proxy hop (`trust proxy = 1`) so rate limits apply per real client IP behind Railway's router.
+The app trusts one proxy hop (`trust proxy = 1`) so rate limits apply per real client IP behind Render's router.
 
 ---
 
