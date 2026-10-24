@@ -552,6 +552,7 @@ npm run start:dev                # http://localhost:3000/api/v1/restaurants
 |---|---|---|
 | `DATABASE_URL` | none (required) | Postgres connection string |
 | `PORT` | `3000` | HTTP port (Render injects this) |
+| `TRUST_PROXY_HOPS` | `1` (`3` on Render) | reverse proxies in front of the app; the client IP is taken that many hops from the right of `X-Forwarded-For`, so rate limits are per real client and cannot be spoofed |
 | `RATE_LIMIT_MAX` | `100` | requests allowed per window per IP |
 | `RATE_LIMIT_TTL_MS` | `60000` | window length in milliseconds |
 | `PAGINATION_DEFAULT_LIMIT` | `20` | page size when `limit` is omitted |
@@ -598,7 +599,7 @@ The API is deployed on Render (Blueprint in `render.yaml`) with a managed Postgr
 4. The seed runs against production on every boot; it inserts nothing once the data is loaded. You can also run it by hand with the database's external URL: `DATABASE_URL=<external url> npm run db:seed`.
 5. Confirm: `curl https://<service>.onrender.com/api/v1/restaurants?limit=1` returns `meta.total` of 300.
 
-The app trusts one proxy hop (`trust proxy = 1`) so rate limits apply per real client IP behind Render's router.
+Behind Render the request passes through Cloudflare and Render's router, so the app trusts three proxy hops (`TRUST_PROXY_HOPS=3`, applied automatically on Render). With too few hops every visitor would share one proxy address and the rate limit would not work; this was found and fixed while testing the live deployment.
 
 ---
 

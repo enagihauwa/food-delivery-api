@@ -71,3 +71,37 @@ describe('infrastructure', () => {
     });
   });
 });
+
+describe('rate limit client identification behind proxies', () => {
+  let app: NestExpressApplication;
+  beforeAll(async () => {
+    process.env.RATE_LIMIT_MAX = '3';
+    process.env.TRUST_PROXY_HOPS = '3'; // Render: client, Cloudflare, Render router
+    app = await createTestApp();
+    process.env.RATE_LIMIT_MAX = '100000';
+    delete process.env.TRUST_PROXY_HOPS;
+  });
+  afterAll(async () => {
+    await app.close();
+  });
+
+  const hit = (xff: string) => request(app.getHttpServer()).get('/api/v1/restaurants?limit=1').set('X-Forwarded-For', xff);
+
+  it('limits per real client IP, not per proxy address', async () => {
+    const chain = (client: string) => `${client}, 104.22.76.140, 10.31.55.151`;
+    const a = [];
+    for (let i = 0; i < 4; i++) a.push((await hit(chain('203.0.113.10'))).status);
+    expect(a).toEqual([200, 200, 200, 429]);
+
+    // A different client behind the very same proxies has its own allowance.
+    expect((await hit(chain('203.0.113.11'))).status).toBe(200);
+  });
+
+  it('cannot be dodged by sending a forged X-Forwarded-For', async () => {
+    const real = '198.51.100.7, 104.22.76.140, 10.31.55.151';
+    for (let i = 0; i < 3; i++) await hit(real).expect(200);
+    for (const forged of ['1.1.1.1', '2.2.2.2', '3.3.3.3']) {
+      expect((await hit(`${forged}, ${real}`)).status).toBe(429); // prepended entries are ignored
+    }
+  });
+});

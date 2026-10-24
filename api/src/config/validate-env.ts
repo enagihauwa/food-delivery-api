@@ -1,4 +1,4 @@
-const POSITIVE_INTS = ['RATE_LIMIT_TTL_MS', 'RATE_LIMIT_MAX', 'PAGINATION_DEFAULT_LIMIT', 'PAGINATION_MAX_LIMIT', 'PORT'];
+const POSITIVE_INTS = ['RATE_LIMIT_TTL_MS', 'RATE_LIMIT_MAX', 'PAGINATION_DEFAULT_LIMIT', 'PAGINATION_MAX_LIMIT', 'PORT', 'TRUST_PROXY_HOPS'];
 
 /** Fails fast at boot with a readable message instead of misbehaving later. */
 export function validateEnv(env: Record<string, unknown>): Record<string, unknown> {

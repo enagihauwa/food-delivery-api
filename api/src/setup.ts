@@ -11,8 +11,9 @@ export function configureApp(app: NestExpressApplication) {
   const config = app.get<ConfigService<AppConfig, true>>(ConfigService);
   const origins = config.get('corsOrigins', { infer: true });
 
-  // Behind Railway's proxy: trust X-Forwarded-For so rate limits are per real client IP.
-  app.set('trust proxy', 1);
+  // Trust exactly N proxy hops, counted from the right of X-Forwarded-For, so the rate limit keys on the
+  // real client IP and a client cannot spoof it by sending its own header.
+  app.set('trust proxy', config.get('trustProxyHops', { infer: true }));
   // Public read API: allow browsers on other origins to use responses (CORS still gates fetch).
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.enableCors({

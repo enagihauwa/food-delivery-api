@@ -26,6 +26,9 @@ services:
         fromDatabase:
           name: foodapi-db
           property: connectionString
+      # Proxy hops in front of the app: client > Cloudflare > Render router. Needed for per-client rate limits.
+      - key: TRUST_PROXY_HOPS
+        value: "3"
       - key: RATE_LIMIT_MAX
         value: "100"
       - key: RATE_LIMIT_TTL_MS

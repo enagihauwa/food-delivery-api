@@ -8,6 +8,9 @@ export default () => ({
   env: process.env.NODE_ENV ?? 'development',
   port: int(process.env.PORT, 3000),
   databaseUrl: process.env.DATABASE_URL ?? '',
+  // How many reverse proxies sit in front of the app (X-Forwarded-For hops to skip from the right).
+  // Defaults to 1, or 3 on Render (client, Cloudflare, Render router) which sets RENDER=true.
+  trustProxyHops: int(process.env.TRUST_PROXY_HOPS, process.env.RENDER === 'true' ? 3 : 1),
   corsOrigins: (process.env.CORS_ORIGINS ?? '')
     .split(',')
     .map((o) => o.trim())
