@@ -105,3 +105,15 @@ describe('rate limit client identification behind proxies', () => {
     }
   });
 });
+
+describe('CORS_ORIGINS tolerates a trailing slash', () => {
+  it('still grants the origin the browser actually sends', async () => {
+    process.env.CORS_ORIGINS = 'https://consumer.example.app/';
+    const app = await createTestApp();
+    delete process.env.CORS_ORIGINS;
+    process.env.CORS_ORIGINS = 'http://localhost:5173';
+    const res = await request(app.getHttpServer()).get('/api/v1/restaurants?limit=1').set('Origin', 'https://consumer.example.app').expect(200);
+    expect(res.headers['access-control-allow-origin']).toBe('https://consumer.example.app');
+    await app.close();
+  });
+});

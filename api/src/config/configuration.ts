@@ -13,7 +13,7 @@ export default () => ({
   trustProxyHops: int(process.env.TRUST_PROXY_HOPS, process.env.RENDER === 'true' ? 3 : 1),
   corsOrigins: (process.env.CORS_ORIGINS ?? '')
     .split(',')
-    .map((o) => o.trim())
+    .map((o) => o.trim().replace(/\/+$/, '')) // an origin never has a trailing slash
     .filter(Boolean),
   rateLimit: {
     ttlMs: int(process.env.RATE_LIMIT_TTL_MS, 60_000),
