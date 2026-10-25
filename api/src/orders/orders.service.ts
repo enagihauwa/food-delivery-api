@@ -6,7 +6,7 @@ import { Paginated } from '../common/pagination/paginated.js';
 import type { AppConfig } from '../config/configuration.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateOrderDto, UpdateOrderDto } from './dto/order-body.dto.js';
-import type { CustomerOrdersQueryDto, OrdersQueryDto } from './dto/orders-query.dto.js';
+import type { CustomerOrdersQueryDto, OrdersQueryDto, RestaurantOrdersQueryDto } from './dto/orders-query.dto.js';
 import { canEditAddress, canTransition } from './order-status.js';
 import { ORDER_WITH_ITEMS, toOrderDto } from './order.mapper.js';
 
@@ -52,6 +52,17 @@ export class OrdersService {
 
   listForCustomer(customerId: string, query: CustomerOrdersQueryDto) {
     return this.page({ customerId, ...(query.status ? { status: query.status } : {}) }, query);
+  }
+
+  listForRestaurant(restaurantId: string, query: RestaurantOrdersQueryDto) {
+    return this.page(
+      {
+        restaurantId,
+        ...(query.status ? { status: query.status } : {}),
+        ...(query.customerId ? { customerId: query.customerId } : {}),
+      },
+      query,
+    );
   }
 
   async findOne(id: string) {

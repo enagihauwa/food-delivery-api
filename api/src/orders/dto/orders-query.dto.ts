@@ -12,6 +12,13 @@ export class CustomerOrdersQueryDto extends PaginationQueryDto {
   status?: OrderStatus;
 }
 
+/** Filters for `/restaurants/:id/orders`. */
+export class RestaurantOrdersQueryDto extends CustomerOrdersQueryDto {
+  @IsOptional()
+  @IsUUID(undefined, { message: 'customerId must be a UUID' })
+  customerId?: string;
+}
+
 /** Filters for `/orders`. Money values are in kobo. */
 export class OrdersQueryDto extends CustomerOrdersQueryDto {
   @IsOptional()
