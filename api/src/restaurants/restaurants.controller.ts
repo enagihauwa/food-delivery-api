@@ -3,6 +3,7 @@ import { ParseUuidPipe } from '../common/pipes/parse-uuid.pipe.js';
 import { queryPipe } from '../common/pipes/validation.pipes.js';
 import { RestaurantMenuQueryDto } from '../menu-items/dto/menu-items-query.dto.js';
 import { MenuItemsService } from '../menu-items/menu-items.service.js';
+import { NoQueryDto } from './dto/no-query.dto.js';
 import { RestaurantsQueryDto } from './dto/restaurants-query.dto.js';
 import { RestaurantsService } from './restaurants.service.js';
 
@@ -21,6 +22,11 @@ export class RestaurantsController {
   @Get(':id')
   findOne(@Param('id', new ParseUuidPipe('Restaurant')) id: string) {
     return this.restaurants.findOne(id);
+  }
+
+  @Get(':id/stats')
+  stats(@Param('id', new ParseUuidPipe('Restaurant')) id: string, @Query(queryPipe) _query: NoQueryDto) {
+    return this.restaurants.stats(id);
   }
 
   @Get(':id/menu')
