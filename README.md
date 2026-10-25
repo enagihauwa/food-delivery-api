@@ -262,6 +262,35 @@ curl "$API/api/v1/restaurants/29018020-db8b-556d-a948-bb9ebbe693dd"
 ```
 Unknown or malformed id → `404 NOT_FOUND`.
 
+#### `GET /api/v1/restaurants/:id/stats`: order statistics for one restaurant
+
+Takes no query parameters (any parameter is a `400`). Unknown or malformed id is `404`.
+
+| Field | Meaning |
+|---|---|
+| `orders.total` | all orders ever placed at the restaurant |
+| `orders.byStatus` | count per status; **every status is always present**, `0` when none |
+| `revenueKobo` | sum of `totalKobo` over **delivered** orders only. Cancelled and in-progress orders are not revenue. |
+| `averageOrderKobo` | `revenueKobo` divided by delivered orders, rounded to a whole kobo; `null` when nothing has been delivered |
+
+```bash
+curl "$API/api/v1/restaurants/e720e999-14e9-5bfb-b710-e14667ecdb48/stats"
+```
+```json
+{
+  "data": {
+    "restaurantId": "e720e999-14e9-5bfb-b710-e14667ecdb48",
+    "currency": "NGN",
+    "orders": {
+      "total": 7,
+      "byStatus": { "pending": 0, "preparing": 0, "out_for_delivery": 0, "delivered": 7, "cancelled": 0 }
+    },
+    "revenueKobo": 46755000,
+    "averageOrderKobo": 6679286
+  }
+}
+```
+
 #### `GET /api/v1/restaurants/:id/menu`: a restaurant's menu (nested)
 
 | Query param | Type | Default | Description |
