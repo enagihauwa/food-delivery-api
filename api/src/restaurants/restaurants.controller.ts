@@ -3,9 +3,9 @@ import { ParseUuidPipe } from '../common/pipes/parse-uuid.pipe.js';
 import { queryPipe } from '../common/pipes/validation.pipes.js';
 import { RestaurantMenuQueryDto } from '../menu-items/dto/menu-items-query.dto.js';
 import { MenuItemsService } from '../menu-items/menu-items.service.js';
-import { NoQueryDto } from './dto/no-query.dto.js';
 import { RestaurantsQueryDto } from './dto/restaurants-query.dto.js';
 import { RestaurantsService } from './restaurants.service.js';
+import { NoQueryDto } from './dto/no-query.dto.js';
 
 @Controller('restaurants')
 export class RestaurantsController {
