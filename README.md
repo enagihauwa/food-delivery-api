@@ -303,6 +303,21 @@ curl "$API/api/v1/restaurants/29018020-db8b-556d-a948-bb9ebbe693dd/menu?availabl
 }
 ```
 
+#### `GET /api/v1/restaurants/:id/orders`: a restaurant's orders (nested)
+
+| Query param | Type | Default | Description |
+|---|---|---|---|
+| `status` | enum | none | `pending` `preparing` `out_for_delivery` `delivered` `cancelled` |
+| `customerId` | uuid | none | only this customer's orders at the restaurant |
+| `sort` | `createdAt` \| `total` | `createdAt` | `total` sorts by `totalKobo` |
+| `limit`, `cursor`, `offset`, `order` | | see Pagination | |
+
+Items are the same objects as in `GET /api/v1/orders` (no `items` array; fetch an order for its lines). An existing restaurant with no orders returns an empty page; an unknown or malformed restaurant id is `404`. Other order filters (`minTotal`, `from`, ...) live on `GET /api/v1/orders?restaurantId=...` and are rejected here with `400`.
+
+```bash
+curl "$API/api/v1/restaurants/e720e999-14e9-5bfb-b710-e14667ecdb48/orders?status=delivered&sort=total&order=desc&limit=5"
+```
+
 ### Menu items
 
 #### `GET /api/v1/menu-items`: list all menu items
